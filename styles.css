@@ -1,0 +1,227 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 8em 0;
+    height: 200vh;
+}
+
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    pointer-events: none;
+}
+.flashcard {
+    min-height: 100px;
+    margin: 20px;
+    border: 1px solid #67bed2;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 1em;
+    color: #ffffff;
+    border: 1px solid #67bed2;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.flashcard div {
+    margin: 5px 0;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.btn-wrp{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#csvLabel:hover {
+    cursor: pointer;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: transparent; 
+    color: #e0e0e0;
+    border: 1px solid #67bed2; /* Đổi màu border cho tất cả nút */
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+button:hover {
+    background-color: rgba(79, 209, 255, 0.15); 
+    color: #23272f;
+    box-shadow: 0 0 12px #03e9f4, 0 0 24px #03e9f4;
+}
+
+button:hover span.effect {
+    opacity: 1;
+    filter: brightness(1.5) drop-shadow(0 0 6px #03e9f4);
+}
+
+button span.effect {
+    position: absolute;
+    display: block;
+    opacity: 0.6;
+    transition: opacity 0.2s, filter 0.2s;
+    pointer-events: none;
+}
+
+button span.effect:nth-child(1) {
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #03e9f4, transparent);
+    animation: animate1 2s linear infinite;
+}
+
+button span.effect:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, #03e9f4, transparent);
+    animation: animate2 2s linear infinite;
+    animation-delay: 0.5s;
+}
+
+button span.effect:nth-child(3) {
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(270deg, #03e9f4, transparent);
+    animation: animate3 2s linear infinite;
+    animation-delay: 1s;
+}
+
+button span.effect:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(360deg, #03e9f4, transparent);
+    animation: animate4 2s linear infinite;
+    animation-delay: 1.5s;
+}
+
+button.active {
+    color: #23272f;
+    box-shadow: 0 0 12px #04b2bb, 0 0 24px #14959b;
+    border: 1.5px solid #67bed2;
+}
+
+select#videoSelect,
+label#openFileBtn {
+    background-color: transparent;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 16px;
+    margin-left: 10px;
+    outline: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+select#videoSelect:focus,
+label#openFileBtn:hover {
+    border: 1.5px solid #03e9f4;
+    box-shadow: 0 0 12px #03e9f4, 0 0 24px #03e9f4;
+    background-color: rgba(79, 209, 255, 0.15);
+    color: #23272f;
+}
+
+select#videoSelect option {
+    background-color: #23272f;
+    color: #e0e0e0;
+}
+
+body,
+.flashcard,
+button,
+select#videoSelect,
+label#openFileBtn {
+    background-color: transparent !important;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s, border 0.3s;
+}
+
+@keyframes animate1 {
+    0% {
+        left: -100%;
+    }
+
+    50%,
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes animate2 {
+    0% {
+        top: -100%;
+    }
+
+    50%,
+    100% {
+        top: 100%;
+    }
+}
+
+@keyframes animate3 {
+    0% {
+        right: -100%;
+    }
+
+    50%,
+    100% {
+        right: 100%;
+    }
+}
+
+@keyframes animate4 {
+    0% {
+        bottom: -100%;
+    }
+
+    50%,
+    100% {
+        bottom: 100%;
+    }
+}
+
+h1 {
+    display: none;
+}
+
+.btn-prev,
+.btn-next {
+    border: none;
+    opacity: 0;
+    background-color: #181a20;
+    flex: 1;
+    height: 100vh;
+}
