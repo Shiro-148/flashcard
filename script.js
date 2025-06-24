@@ -1,4 +1,4 @@
-   const videoList = [
+const videoList = [
       "C:/Users/LENOVO/Videos/wallpaper/bocchi-walking-in-the-rain-wallpaperwaifu-com.mp4",
       "C:/Users/LENOVO/Videos/wallpaper/samurai-sword-stars-wallpaperwaifu-com.mp4",
       "C:/Users/LENOVO/Videos/wallpaper/cozy-autumn-rain-wallpaperwaifu-com.mp4",
@@ -171,7 +171,8 @@
       const meaning = card[2] || '';
       const note = card[3] || '';
 
-      let html = `<div>${isFront ? front : back}</div>`;
+      let html = `<div class = "count" style="font-size:12px;opacity:0.7;margin-bottom:4px; font-weight: 600;">${currentIndex + 1} / ${cards.length}</div>`;
+      html += `<div>${isFront ? front : back}</div>`;
       if (showMeaning && meaning) {
         html += `<div>${meaning}</div>`;
       }
@@ -275,3 +276,32 @@
       `;
       document.head.appendChild(style);
     })();
+
+window.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, document.body.scrollHeight);
+});
+
+window.addEventListener('keydown', function(e) {
+  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+  }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (e.key === 'ArrowRight' || e.key === 'a') {
+    nextCard();
+  } else if (e.key === 'ArrowLeft' || e.key === 'd') {
+    prevCard();
+  } else if (e.key === '0' || e.key === ' ' || e.key === 'Enter' || e.key === 's'|| e.key === 'ArrowDown') {
+    flipCard();
+  } else if (e.key === '2' || e.key === 'ArrowUp' || e.key === 'e' || e.key === 'w') {
+    toggleNote();
+  } else if (e.key === '1' || e.key === 'q') {
+    toggleMeaning();
+  }
+});
+
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  flipCard();
+});
+
