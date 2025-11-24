@@ -7,6 +7,23 @@ const videoList = [
   "C:/Users/LENOVO/Videos/wallpaper/anime-girl-looking-at-the-cherry-blossoms-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/elaina-drinking-coffee-near-window-majo-no-tabitabi-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/anime-girl-silhouette-watching-the-plane-wallpaperwaifu-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/rain-at-night-wallpaperwaifu-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/ocean-painting-wallpaperwaifu-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/japanese-restaurant-street-day-and-night-wallpaperwaifu-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/traditional-japanese-room-day-and-night-wallpaperwaifu-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/adorable-black-kitten-with-big-amber-eyes-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/doggie-corgi-playing-with-his-friend-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/japanese-street-at-night-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/abi-toads-sledding-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/black-cat-bus-stop-at-dusk-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/lazy-river-abi-toads-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/frogs-lily-pad-riding-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/cat-and-bee-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/frog-couple-relaxing-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/floating-ducks-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/frog-sleeping-near-the-waterfall-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/serene-twilight-from-a-seaside-balcony-moewalls-com.mp4",
+  "C:/Users/LENOVO/Videos/wallpaper/beach-island-moewalls-com.mp4",
 ];
 
 function saveProgress() {
@@ -16,8 +33,6 @@ function saveProgress() {
     originalCards,
     currentIndex,
     isFront,
-    showMeaning,
-    showNote,
     frontColumnIndex
   }));
 }
@@ -32,8 +47,6 @@ function loadProgress() {
         originalCards = obj.originalCards || obj.cards;
         currentIndex = obj.currentIndex || 0;
         isFront = obj.isFront ?? true;
-        showMeaning = obj.showMeaning ?? false;
-        showNote = obj.showNote ?? false;
         
         if (typeof obj.frontColumnIndex !== 'undefined') {
           frontColumnIndex = obj.frontColumnIndex;
@@ -50,96 +63,115 @@ function loadProgress() {
   return false;
 }
 
-window.onload = function () {
-  const select = document.getElementById('videoSelect');
-  videoList.forEach((src, idx) => {
-    const opt = document.createElement('option');
-    opt.value = src;
-    opt.textContent = `${idx + 1}`;
-    select.appendChild(opt);
-  });
-  const lastBg = localStorage.getItem('bgVideo');
-  if (lastBg && videoList.includes(lastBg)) {
-    changeBgVideo(lastBg);
-    select.value = lastBg;
-  } else {
-    changeBgVideo(videoList[0]);
-    select.value = videoList[0];
-  }
-  document.getElementById('btn-meaning').classList.remove('active');
-  document.getElementById('btn-note').classList.remove('active');
+let currentVideoSrc = "";
 
+window.onload = function () {
+  // Khởi tạo màu chữ
   let isTextWhite = localStorage.getItem('flashcardTextWhite');
   if (isTextWhite === null) isTextWhite = 'true';
   isTextWhite = isTextWhite === 'true';
   window.isTextWhite = isTextWhite;
   
-  document.getElementById('toggleTextColorText').textContent = '🌗';
-  const btn = document.getElementById('toggleTextColorBtn');
-  btn.classList.toggle('text-white', isTextWhite);
-  btn.classList.toggle('text-black', !isTextWhite);
-  
-  const cardButtons = document.querySelectorAll('.content-main button');
-  cardButtons.forEach(btn => {
-    btn.style.color = isTextWhite ? '#ffffff' : '#000000';
-  });
-  document.getElementById('videoSelect').style.color = isTextWhite ? '#ffffff' : '#000000';
-  document.getElementById('openFileBtn').style.color = isTextWhite ? '#ffffff' : '#000000';
-  document.getElementById('toggleSideBtn').style.color = isTextWhite ? '#ffffff' : '#000000';
-  
-  const searchInput = document.querySelector('form input[name="q"]');
-  const searchBtn = document.querySelector('form button[type="submit"]');
-  if (searchInput) {
-    searchInput.style.color = isTextWhite ? '#ffffff' : '#000000';
-    searchInput.style.setProperty('--placeholder-color', isTextWhite ? '#fff' : '#000');
-    searchInput.classList.toggle('text-white', isTextWhite);
-    searchInput.classList.toggle('text-black', !isTextWhite);
+  applyTextColor();
+
+  // Khởi tạo video
+  const lastBg = localStorage.getItem('bgVideo');
+  if (lastBg && (videoList.includes(lastBg) || lastBg.startsWith('blob:'))) {
+    changeBgVideo(lastBg);
+  } else {
+    changeBgVideo(videoList[0]);
   }
-  if (searchBtn) {
-    searchBtn.style.color = isTextWhite ? '#ffffff' : '#000000';
-  }
-  const flashcards = document.querySelectorAll('.flashcard');
-  flashcards.forEach(card => {
-    card.style.color = isTextWhite ? '#ffffff' : '#000000';
-  });
+  
   loadProgress();
 };
 
-function toggleVideoSelect() {
-  const select = document.getElementById('videoSelect');
-  const openFileBtn = document.getElementById('openFileBtn');
-  const isHidden = select.style.display === 'none';
-  select.style.display = isHidden ? 'inline' : 'none';
-  openFileBtn.style.display = isHidden ? 'inline' : 'none';
+// --- LOGIC ẨN / HIỆN CONTENT ---
+function toggleContentVisibility() {
+    const content = document.getElementById('mainContent');
+    const btnText = document.getElementById('eyeIcon');
+    
+    // Toggle class thay vì display trực tiếp để dễ quản lý
+    content.classList.toggle('content-hidden');
+    
+    if (content.classList.contains('content-hidden')) {
+        btnText.textContent = '🙈'; // Icon khỉ che mắt (hoặc icon mở mắt tùy ý)
+    } else {
+        btnText.textContent = '🐾'; // Icon mắt
+    }
 }
 
+// --- LOGIC VIDEO MODAL MỚI ---
+function openVideoModal() {
+    const modal = document.getElementById('videoModal');
+    const grid = document.getElementById('videoGrid');
+    grid.innerHTML = ''; // Clear cũ
+
+    videoList.forEach((src, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'video-item-btn';
+        
+        // Lấy tên file cho gọn
+        let name = `Video ${idx + 1}`;
+        try {
+           if(src.startsWith('blob:')) {
+               name = `Video Upload ${idx+1}`;
+           } else {
+               const parts = src.split('/');
+               // Lấy 1 đoạn tên ngắn gọn
+               const fileName = parts[parts.length - 1];
+               name = fileName.substring(0, 10) + '...'; 
+           }
+        } catch(e){}
+
+        btn.innerHTML = `<span style="font-size:24px;">🎬</span><span>${name}</span>`;
+        
+        if (src === currentVideoSrc) {
+            btn.classList.add('active');
+        }
+
+        btn.onclick = function() {
+            changeBgVideo(src);
+            closeVideoModal();
+        };
+        grid.appendChild(btn);
+    });
+
+    modal.style.display = 'block';
+}
+
+function closeVideoModal() {
+    document.getElementById('videoModal').style.display = 'none';
+}
+
+// Đóng modal khi click ra ngoài
+window.onclick = function(event) {
+    const modal = document.getElementById('videoModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Xử lý chọn file video từ máy
 document.getElementById('videoFileInput').addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
   const url = URL.createObjectURL(file);
   videoList.push(url);
-  const select = document.getElementById('videoSelect');
-  const opt = document.createElement('option');
-  opt.value = url;
-  opt.textContent = 'Video mới';
-  select.appendChild(opt);
-  select.value = url;
-  onVideoSelected(url);
-  select.style.display = 'none';
-  document.getElementById('openFileBtn').style.display = 'none';
+  changeBgVideo(url);
+  closeVideoModal();
 });
 
-function onVideoSelected(src) {
-  changeBgVideo(src);
-  const select = document.getElementById('videoSelect');
-  select.value = src;
-  document.getElementById('videoSelect').style.display = 'none';
-  document.getElementById('openFileBtn').style.display = 'none';
-}
 
 function changeBgVideo(src) {
-  document.getElementById('bg-source').src = src;
-  document.getElementById('bg-video').load();
+  currentVideoSrc = src;
+  const bgVideo = document.getElementById('bg-video');
+  const bgSource = document.getElementById('bg-source');
+  
+  // Chỉ reload nếu src thay đổi để tránh giật
+  if(bgSource.src !== src && bgSource.src !== window.location.href + src) {
+      bgSource.src = src;
+      bgVideo.load();
+  }
   localStorage.setItem('bgVideo', src);
 }
 
@@ -147,8 +179,7 @@ let originalCards = [];
 let cards = [];
 let currentIndex = 0;
 let isFront = true;
-let showMeaning = false;
-let showNote = false;
+// Đã bỏ biến showMeaning, showNote vì sẽ mặc định hiện ở mặt sau
 let frontColumnIndex = 0; 
 
 function toggleSide() {
@@ -161,13 +192,11 @@ function toggleSide() {
 function updateSideButtonText() {
   const btnText = document.getElementById('toggleSideText');
   if (btnText) {
-    btnText.textContent = `🔄`;
+    btnText.textContent = `🔄`; // Có thể thay icon tùy mặt nếu muốn
   }
 }
 
-// --- LOGIC MỚI: Xử lý nhiều file ---
-
-// Hàm hỗ trợ đọc file CSV trả về Promise
+// ... (Giữ nguyên logic đọc file readCSVFile, readXLSXFile, event listener csvFile)
 function readCSVFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -182,7 +211,6 @@ function readCSVFile(file) {
   });
 }
 
-// Hàm hỗ trợ đọc file XLSX trả về Promise
 function readXLSXFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -192,7 +220,6 @@ function readXLSXFile(file) {
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-        // Lọc bỏ dòng trống
         resolve(rows.filter(row => row.length > 0));
       } catch (e) {
         reject(e);
@@ -203,70 +230,40 @@ function readXLSXFile(file) {
   });
 }
 
-// Xử lý sự kiện chọn file (đã sửa để hỗ trợ nhiều file)
 document.getElementById('csvFile').addEventListener('change', async function (e) {
   const files = Array.from(e.target.files);
   if (files.length === 0) return;
-
   let combinedData = [];
-
-  // Tạo danh sách các Promise để đọc file song song
   const readPromises = files.map(file => {
     const ext = file.name.split('.').pop().toLowerCase();
-    if (ext === 'csv') {
-      return readCSVFile(file);
-    } else if (ext === 'xlsx') {
-      return readXLSXFile(file);
-    } else {
-      return Promise.resolve([]); // Bỏ qua file không đúng định dạng
-    }
+    if (ext === 'csv') return readCSVFile(file);
+    else if (ext === 'xlsx') return readXLSXFile(file);
+    else return Promise.resolve([]);
   });
 
   try {
-    // Chờ tất cả file đọc xong
     const results = await Promise.all(readPromises);
-    
-    // Gộp tất cả kết quả lại thành 1 mảng lớn
-    results.forEach(data => {
-      combinedData = combinedData.concat(data);
-    });
-
+    results.forEach(data => { combinedData = combinedData.concat(data); });
     if (combinedData.length > 0) {
       originalCards = combinedData;
       cards = [...originalCards];
       currentIndex = 0;
       isFront = true;
-      showMeaning = false;
-      showNote = false;
       showCard();
     } else {
-      alert("Không tìm thấy dữ liệu trong các file đã chọn.");
+      alert("Không tìm thấy dữ liệu.");
     }
   } catch (err) {
-    console.error("Lỗi khi đọc file:", err);
-    alert("Có lỗi xảy ra khi đọc file.");
+    console.error(err);
+    alert("Lỗi khi đọc file.");
   }
-  
-  // Reset input để có thể chọn lại cùng file nếu muốn
   e.target.value = ''; 
 });
-
-// Giữ lại hàm parseCSV cũ để tương thích nếu cần (dù logic mới đã tích hợp sẵn)
-function parseCSV(csv) {
-  const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
-  originalCards = lines.map(line => line.split(','));
-  cards = [...originalCards];
-  currentIndex = 0;
-  isFront = true;
-  showMeaning = false;
-  showNote = false;
-  showCard();
-}
 
 function showCard() {
   const flashcard = document.getElementById('flashcard');
   if (cards.length === 0) {
-    flashcard.innerHTML = "<div>Không có dữ liệu</div>";
+    flashcard.innerHTML = "<div>Chưa có dữ liệu</div>";
     saveProgress();
     return;
   }
@@ -282,24 +279,20 @@ function showCard() {
   let html = `<div class = "count" style="font-size:12px;opacity:0.7;margin-bottom:4px; font-weight: 600;">${currentIndex + 1} / ${cards.length}</div>`;
 
   if (isFront) {
+    // MẶT TRƯỚC: Chỉ hiện nội dung chính
     const frontText = content[frontColumnIndex];
     html += `<div class = "front">${frontText}</div>`;
-    
-    if (showMeaning && meaning && frontColumnIndex !== 2) {
-      html += `<div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">${meaning}</div>`;
-    }
-    if (showNote && note && frontColumnIndex !== 3) {
-      html += `<div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">${note}</div>`;
-    }
   } else {
+    // MẶT SAU: Hiện đầy đủ thông tin (Mặc định hiện hết vì đã bỏ nút chọn)
     if (col1) html += `<div style="margin-bottom: 8px;font-size:40px;">${col1}</div>`;
     if (col2) html += `<div style="margin-bottom: 8px; font-weight: bold;">${col2}</div>`;
+    // Luôn hiện Âm Hán và Nghĩa ở mặt sau
     if (meaning) html += `<div style="margin-bottom: 5px; font-style: italic; opacity: 0.9;">${meaning}</div>`;
     if (note) html += `<div style="opacity: 0.9;">${note}</div>`;
   }
 
   flashcard.innerHTML = html;
-  flashcard.style.color = window.isTextWhite ? '#ffffff' : '#000000';
+  applyTextColor(); // Đảm bảo màu chữ đúng sau khi render
   saveProgress();
 }
 
@@ -312,10 +305,6 @@ function nextCard() {
   if (cards.length === 0) return;
   currentIndex = (currentIndex + 1) % cards.length;
   isFront = true;
-  showMeaning = false;
-  showNote = false;
-  document.getElementById('btn-meaning').classList.remove('active');
-  document.getElementById('btn-note').classList.remove('active');
   showCard();
 }
 
@@ -323,10 +312,6 @@ function prevCard() {
   if (cards.length === 0) return;
   currentIndex = (currentIndex - 1 + cards.length) % cards.length;
   isFront = true;
-  showMeaning = false;
-  showNote = false;
-  document.getElementById('btn-meaning').classList.remove('active');
-  document.getElementById('btn-note').classList.remove('active');
   showCard();
 }
 
@@ -337,110 +322,64 @@ function shuffleCards() {
   }
   currentIndex = 0;
   isFront = true;
-  showMeaning = false;
-  showNote = false;
-  document.getElementById('btn-meaning').classList.remove('active');
-  document.getElementById('btn-note').classList.remove('active');
   showCard();
 }
 
-function toggleMeaning() {
-  showMeaning = !showMeaning;
-  document.getElementById('btn-meaning').classList.toggle('active', showMeaning);
-  showCard();
-}
-
-function toggleNote() {
-  showNote = !showNote;
-  document.getElementById('btn-note').classList.toggle('active', showNote);
-  showCard();
+function applyTextColor() {
+    const color = window.isTextWhite ? '#ffffff' : '#000000';
+    
+    const flashcards = document.querySelectorAll('.flashcard');
+    flashcards.forEach(card => card.style.color = color);
+    
+    const cardButtons = document.querySelectorAll('button');
+    cardButtons.forEach(btn => btn.style.color = color);
+    
+    // Cập nhật icon nút toggle màu
+    document.getElementById('toggleTextColorText').textContent = '🌗';
+    const btn = document.getElementById('toggleTextColorBtn');
+    btn.classList.toggle('text-white', window.isTextWhite);
+    btn.classList.toggle('text-black', !window.isTextWhite);
 }
 
 document.getElementById('toggleTextColorBtn').addEventListener('click', function () {
   window.isTextWhite = !window.isTextWhite;
-  const flashcards = document.querySelectorAll('.flashcard');
-  flashcards.forEach(card => {
-    card.style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  });
-  const cardButtons = document.querySelectorAll('.content-main button');
-  cardButtons.forEach(btn => {
-    btn.style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  });
-  document.getElementById('videoSelect').style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  document.getElementById('openFileBtn').style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  document.getElementById('toggleSideBtn').style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  
-  const searchInput = document.querySelector('form input[name="q"]');
-  const searchBtn = document.querySelector('form button[type="submit"]');
-  if (searchInput) {
-    searchInput.style.color = window.isTextWhite ? '#ffffff' : '#000000';
-    searchInput.style.setProperty('--placeholder-color', window.isTextWhite ? '#fff' : '#000');
-    searchInput.classList.toggle('text-white', window.isTextWhite);
-    searchInput.classList.toggle('text-black', !window.isTextWhite);
-  }
-  if (searchBtn) {
-    searchBtn.style.color = window.isTextWhite ? '#ffffff' : '#000000';
-  }
+  applyTextColor();
   localStorage.setItem('flashcardTextWhite', window.isTextWhite);
-  document.getElementById('toggleTextColorText').textContent = '🌗';
-  const btn = document.getElementById('toggleTextColorBtn');
-  btn.classList.toggle('text-white', window.isTextWhite);
-  btn.classList.toggle('text-black', !window.isTextWhite);
-});
-
-(function () {
-  const style = document.createElement('style');
-  style.innerHTML = `
-        form input[name="q"]::placeholder {
-          color: var(--placeholder-color, #cccccc);
-          opacity: 1;
-        }
-      `;
-  document.head.appendChild(style);
-})();
-
-window.addEventListener('DOMContentLoaded', function () {
-  window.scrollTo(0, document.body.scrollHeight);
 });
 
 window.addEventListener('keydown', function (e) {
-  if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) return;
-
-  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-    e.preventDefault();
-  }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
   if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
     nextCard();
   } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
     prevCard();
-  } else if (e.key === '0' || e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown') {
+  } else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     flipCard();
-  } else if (e.key === '2' || e.key === 'ArrowUp' || e.key === 'e' || e.key === 's' || e.key === 'E' || e.key === 'S') {
-    toggleNote();
-  } else if (e.key === '1' || e.key === 'q' || e.key === 'Q' || e.key === 'W' || e.key === 'w' || e.key === 'CapsLock') {
-    toggleMeaning();
   }
+  // Đã bỏ shortcut '1', '2', 'q', 'e' vì đã bỏ tính năng ẩn/hiện từng phần
 });
 
-// Xử lý click nền
+// Xử lý click nền (Chỉ khi không click vào modal)
 window.addEventListener('click', function (e) {
   if (e.target.closest('button') ||
       e.target.closest('input') ||
       e.target.closest('select') ||
       e.target.closest('label') ||
+      e.target.closest('.video-modal-content') || // Không flip khi click trong modal
       e.target.closest('.flashcard')) {
     return;
   }
-  flipCard();
+  // Chỉ flip khi modal không hiển thị
+  if(document.getElementById('videoModal').style.display !== 'block') {
+      flipCard();
+  }
 });
 
 window.addEventListener('contextmenu', function (e) {
-  if (e.target.closest('button') ||
+   if (e.target.closest('button') ||
       e.target.closest('input') ||
-      e.target.closest('select') ||
-      e.target.closest('label') ||
+      e.target.closest('.video-modal-content') ||
       e.target.closest('.flashcard')) {
     return;
   }
