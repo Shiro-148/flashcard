@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#181a20">
-  <title>Trang chủ</title>
+  <title>Flashcard Pro</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -13,51 +14,55 @@
   <video id="bg-video" autoplay loop muted playsinline>
     <source id="bg-source" src="" type="video/mp4">
   </video>
-  
-  <div class="btn-wrp" style="position:absolute;top:20px;right:20px;z-index:100;">
-    
-    <button id="toggleContentBtn" onclick="toggleContentVisibility()" title="Ẩn/Hiện nội dung">
-      <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-      <span id="eyeIcon">🐾</span>
-    </button>
 
-    <button class="btn-upload" title="Tải file dữ liệu">
-      <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-      <label for="csvFile" id="csvLabel"><span>📝</span></label>
-    </button>
+  <div class="btn-wrp" id="toolBar">
 
-    <button id="toggleSideBtn" onclick="toggleSide()" title="Đổi mặt hiển thị">
+    <button onclick="toggleMenu()" title="Mở Menu" style="z-index: 101;">
       <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-      <span id="toggleSideText">🔄</span>
+      <span id="menuIcon">☰</span>
     </button>
-
-    <button id="toggleTextColorBtn" title="Đổi màu chữ">
-      <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-      <span id="toggleTextColorText">🌗</span>
-    </button>
+    <div id="subButtons" class="sub-buttons-container">
+      <button id="toggleContentBtn" onclick="toggleContentVisibility()" title="Ẩn/Hiện nội dung">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span id="eyeIcon">🐾</span>
+      </button>
+      <button onclick="openVideoModal()" title="Kho hình nền">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span>🎥</span>
+      </button>
+      <button class="btn-upload" title="Tải file dữ liệu (.csv, .xlsx)">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <label for="csvFile" id="csvLabel"><span>📝</span></label>
+      </button>
+      <button id="toggleSideBtn" onclick="toggleSide()" title="Đổi mặt hiển thị">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span id="toggleSideText">🔄</span>
+      </button>
+      <button onclick="shuffleCards()" title="Trộn thẻ">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span>🔀</span>
+      </button>
+      <button id="toggleTextColorBtn" title="Đổi màu chữ">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span id="toggleTextColorText">🌗</span>
+      </button>
+      <button id="reviewBtn" onclick="toggleReviewMode()" title="Chế độ chỉ học từ đánh dấu">
+        <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
+        <span id="reviewIcon">🔖</span>
+      </button>
+    </div>
   </div>
 
   <input type="file" id="csvFile" accept=".csv,.xlsx" style="display:none;" multiple />
-  
-  <div class="content" id="mainContent">
-    <button class="btn-prev" onclick="prevCard()">Trước</button>
-    <div class="content-main">
-      <div class="flashcard" id="flashcard" onclick="flipCard()">Flashcard</div>
-      
-      <div class="controls-row">
-        <button onclick="shuffleCards()">
-          <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-          <span>🔀</span>
-        </button>
-        
-        <button onclick="openVideoModal()">
-          <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-          <span>🎥</span>
-        </button>
-      </div>
 
+  <div class="content" id="mainContent">
+    <button class="btn-prev" onclick="prevCard()"></button>
+    <div class="content-main">
+      <div class="flashcard" id="flashcard">
+        Flashcard
+      </div>
     </div>
-    <button class="btn-next" onclick="nextCard()">Tiếp</button>
+    <button class="btn-next" onclick="nextCard()"></button>
   </div>
 
   <div id="videoModal" class="video-modal">
@@ -67,11 +72,12 @@
         <span class="close-modal" onclick="closeVideoModal()">&times;</span>
       </div>
       <div class="video-grid" id="videoGrid">
-        </div>
+      </div>
       <div class="video-modal-footer">
         <button class="btn-upload-video">
-            <span class="effect"></span><span class="effect"></span><span class="effect"></span><span class="effect"></span>
-            <label for="videoFileInput" style="cursor:pointer;">➕ Thêm Video từ máy</label>
+          <span class="effect"></span><span class="effect"></span><span class="effect"></span><span
+            class="effect"></span>
+          <label for="videoFileInput" style="cursor:pointer;">➕ Thêm Video từ máy</label>
         </button>
         <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/ogg" style="display:none;">
       </div>
@@ -81,4 +87,5 @@
   <script src="script.js"></script>
 
 </body>
+
 </html>
