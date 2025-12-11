@@ -1,7 +1,7 @@
 // --- DANH SÁCH VIDEO MẶC ĐỊNH ---
 const videoList = [
-  "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346962/cat-and-bee-moewalls-com_lpmrhd.mp4",
-  "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346961/abi-toads-sledding-moewalls-com_as8kvs.mp4",
+  // "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346962/cat-and-bee-moewalls-com_lpmrhd.mp4",
+  // "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346961/abi-toads-sledding-moewalls-com_as8kvs.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/bocchi-walking-in-the-rain-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/samurai-sword-stars-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/cozy-autumn-rain-wallpaperwaifu-com.mp4",
@@ -37,6 +37,9 @@ let isFront = true;
 let frontColumnIndex = 0;
 let currentVideoSrc = "";
 let isDraggingMode = false;
+
+// TỔNG SỐ CỘT TỰ ĐỘNG (dựa trên dữ liệu)
+let totalColumns = 1; // mặc định ít nhất 1 cột
 
 // BIẾN CHO TÍNH NĂNG TỪ KHÓ & TIẾN ĐỘ RIÊNG
 let markedCards = new Set();
@@ -231,6 +234,11 @@ function loadProgress() {
 
       if (Array.isArray(obj.cards) && obj.cards.length > 0) {
         originalCards = obj.originalCards || obj.cards;
+        // Tính tổng số cột tối đa dựa vào dữ liệu khôi phục
+        totalColumns = Math.max(
+          1,
+          ...originalCards.map((row) => (Array.isArray(row) ? row.length : 1))
+        );
 
         // Khôi phục đúng chế độ và vị trí tương ứng
         if (savedReviewMode) {
@@ -260,6 +268,8 @@ function loadProgress() {
           typeof obj.frontColumnIndex !== "undefined"
             ? obj.frontColumnIndex
             : 0;
+        // Đảm bảo chỉ số mặt trước không vượt quá số cột hiện có
+        if (frontColumnIndex >= totalColumns) frontColumnIndex = 0;
 
         updateSideButtonText();
         updateReviewBtnState();
@@ -369,13 +379,12 @@ function showCard() {
   }
 
   const card = cards[currentIndex];
-  const content = [
-    card[0] || "",
-    card[1] || "",
-    card[2] || "",
-    card[3] || "",
-    card[4] || "",
-  ];
+  // Dựng nội dung động theo số cột thực tế
+  const maxCols = Array.isArray(card) ? card.length : 1;
+  totalColumns = Math.max(totalColumns, maxCols);
+  const content = Array.from({ length: totalColumns }, (_, i) => card?.[i] || "");
+  // Đảm bảo chỉ số mặt trước không vượt quá tổng số cột hiện tại
+  if (frontColumnIndex >= totalColumns) frontColumnIndex = 0;
 
   const isMarked = markedCards.has(JSON.stringify(card));
   const starColor = isMarked ? "#FFD700" : "rgba(255,255,255,0.3)";
@@ -398,16 +407,21 @@ function showCard() {
   if (isFront) {
     bodyHtml = `<div class = "front">${content[frontColumnIndex]}</div>`;
   } else {
-    if (content[0])
-      bodyHtml += `<div style="margin-bottom: 8px;font-size:40px;">${content[0]}</div>`;
-    if (content[1])
-      bodyHtml += `<div style="margin-bottom: 8px; font-weight: bold;">${content[1]}</div>`;
-    if (content[2])
-      bodyHtml += `<div style="margin-bottom: 5px; font-style: italic; opacity: 0.9;">${content[2]}</div>`;
-    if (content[3])
-      bodyHtml += `<div style="opacity: 0.9;">${content[3]}</div>`;
-    if (content[4])
-      bodyHtml += `<div style="opacity: 0.8; font-size: 0.9em; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top:5px;">${content[4]}</div>`;
+    // Hiển thị linh hoạt tất cả cột còn lại theo style nhẹ
+    content.forEach((val, idx) => {
+      if (!val) return;
+      if (idx === 0) {
+        bodyHtml += `<div style="margin-bottom: 8px;font-size:40px;">${val}</div>`;
+      } else if (idx === 1) {
+        bodyHtml += `<div style="margin-bottom: 8px; font-weight: bold;">${val}</div>`;
+      } else if (idx === 2) {
+        bodyHtml += `<div style="margin-bottom: 5px; font-style: italic; opacity: 0.9;">${val}</div>`;
+      } else if (idx === content.length - 1) {
+        bodyHtml += `<div style="opacity: 0.8; font-size: 0.9em; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top:5px;">${val}</div>`;
+      } else {
+        bodyHtml += `<div style="opacity: 0.9;">${val}</div>`;
+      }
+    });
   }
 
   flashcard.innerHTML = headerHtml + bodyHtml;
@@ -443,11 +457,22 @@ function shuffleCards() {
   }
   currentIndex = 0;
   isFront = true;
+  // Cập nhật lại tổng số cột theo bộ thẻ hiện tại
+  totalColumns = Math.max(
+    1,
+    ...cards.map((row) => (Array.isArray(row) ? row.length : 1))
+  );
+  if (frontColumnIndex >= totalColumns) frontColumnIndex = 0;
   showCard();
 }
 
 function toggleSide() {
-  frontColumnIndex = (frontColumnIndex + 1) % 5;
+  const cols = Math.max(
+    1,
+    ...cards.map((row) => (Array.isArray(row) ? row.length : 1))
+  );
+  totalColumns = cols;
+  frontColumnIndex = (frontColumnIndex + 1) % totalColumns;
   updateSideButtonText();
   isFront = true;
   showCard();
@@ -565,6 +590,13 @@ document
       if (combinedData.length > 0) {
         originalCards = combinedData;
         cards = [...originalCards];
+
+        // Tự tính tổng số cột theo dữ liệu mới
+        totalColumns = Math.max(
+          1,
+          ...originalCards.map((row) => (Array.isArray(row) ? row.length : 1))
+        );
+        if (frontColumnIndex >= totalColumns) frontColumnIndex = 0;
 
         // Khi load file mới, reset mọi thứ về 0 và tắt Review mode
         isReviewMode = false;
