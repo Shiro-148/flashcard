@@ -1,7 +1,7 @@
 // --- DANH SÁCH VIDEO MẶC ĐỊNH ---
 const videoList = [
-  // "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346962/cat-and-bee-moewalls-com_lpmrhd.mp4",
-  // "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346961/abi-toads-sledding-moewalls-com_as8kvs.mp4",
+  "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346962/cat-and-bee-moewalls-com_lpmrhd.mp4",
+  "https://res.cloudinary.com/dqlghjiyb/video/upload/v1764346961/abi-toads-sledding-moewalls-com_as8kvs.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/bocchi-walking-in-the-rain-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/samurai-sword-stars-wallpaperwaifu-com.mp4",
   "C:/Users/LENOVO/Videos/wallpaper/cozy-autumn-rain-wallpaperwaifu-com.mp4",
